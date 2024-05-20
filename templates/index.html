@@ -1,0 +1,218 @@
+{% extends 'layout.html' %} {% block styles %}
+<style>
+  .container {
+    padding-top: 50px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  header h1 {
+    font-size: 1.8rem;
+  }
+  .summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  @media (max-width: 768px) {
+    .summary {
+      flex-direction: column;
+    }
+  }
+  .summary .chart {
+    width: 350px;
+  }
+  .summary-card {
+    width: 350px;
+    background-color: #ddd;
+    box-shadow: 0 0px 5px 0 var(--shadow-color);
+    padding: 30px 20px;
+    text-align: center;
+  }
+  @media (max-width: 500px) {
+    .summary .chart,
+    .summary-card {
+      width: 100%;
+    }
+  }
+  .summary-card div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem !important;
+    margin-bottom: 10px;
+  }
+  .summary-card h4 {
+    font-size: 1.2rem;
+    margin-top: 10px;
+  }
+  .summary-card p {
+    margin-top: 10px;
+    font-size: 1.2rem;
+    font-weight: bolder;
+    color: #222;
+  }
+  .actions {
+    margin: 50px 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .actions a {
+    width: 150px;
+    margin: 0 10px;
+    background-color: var(--secondary-color);
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: var(--background-color);
+  }
+  @media (max-width: 500px) {
+    .actions {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+  .actions a:hover {
+    background-color: var(--primary-color);
+  }
+  .recent-transactions {
+    text-align: center;
+  }
+  .recent-transactions table {
+    box-shadow: 0 0 3px 0 var(--shadow-color);
+    background-color: #eee;
+    width: 100%;
+    margin: 30px 0;
+  }
+  .recent-transactions th {
+    color: var(--accent-color);
+  }
+  .recent-transactions th,
+  .recent-transactions td {
+    border: 1px solid var(--secondary-color);
+    padding: 10px 0;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container">
+  <main>
+    <section class="summary">
+      <div class="summary-card">
+        <header>
+          <h1>Welcome, {{ current_user.username }}!</h1>
+        </header>
+        <div>
+          <h4>Total Income:</h4>
+          <p>${{ income }}</p>
+        </div>
+        <hr />
+        <div>
+          <h4>Total Expenses:</h4>
+          <p>${{ expenses }}</p>
+        </div>
+        <hr />
+        <div>
+          <h4>Total Balance:</h4>
+          <p>${{ balance }}</p>
+        </div>
+      </div>
+      <div class="chart">
+        <canvas id="myChart"></canvas>
+      </div>
+    </section>
+    <section class="actions">
+      <a href="{{ url_for('add_income') }}">Add Income</a>
+      <a href="{{ url_for('add_expense') }}">Add Expense</a>
+    </section>
+    <section class="recent-transactions">
+      <h2>Recent Transactions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Description</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if transactions%} {% for transaction in transactions %}
+          <tr>
+            <td>{{ 'Expense' if transaction.description else 'Income' }}</td>
+            <td>{{ transaction.amount }}</td>
+            <td>
+              {% if transaction.description %} {{ transaction.description }} {%
+              elif transaction.source %} {{ transaction.source }}{% endif %}
+            </td>
+            <td>{{ transaction.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>
+              <a
+                href="{{ url_for('edit_transaction', transaction_id=transaction.id) }}"
+                ><i class="fa-solid fa-edit"></i
+              ></a>
+              <a
+                style="color: red"
+                href="{{ url_for('delete_transaction', transaction_id=transaction.id) }}"
+                ><i class="fa-solid fa-x"></i
+              ></a>
+            </td>
+          </tr>
+          {% endfor %} {% else %}
+          <tr>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </section>
+  </main>
+</div>
+{% endblock %} {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById("myChart");
+
+  new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Income", "Expenses"],
+      datasets: [
+        {
+          label: "Amount",
+          data: ["{{income}}", "{{expenses}}"],
+          backgroundColor: ["#c62e65", "#6a0c0c"],
+          borderWidth: 0,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          position: "top",
+        },
+        tooltip: {
+          callbacks: {
+            label: function (tooltipItem) {
+              return tooltipItem.label + ": $" + tooltipItem.raw;
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          display: false,
+        },
+        y: {
+          display: false,
+        },
+      },
+    },
+  });
+</script>
+{% endblock%}

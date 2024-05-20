@@ -1,0 +1,123 @@
+{% extends 'layout.html' %} {% block styles %}
+<style>
+  nav,
+  footer {
+    display: none;
+  }
+  header h2 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+  }
+  .form-section {
+    background: linear-gradient(
+      45deg,
+      var(--background-color) 50%,
+      var(--secondary-color) 50%
+    );
+
+  }
+  .form-section .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+  }
+  @media (max-width: 767px) {
+    .form-section .container {
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+    .form-section .container header {
+      filter: invert(1);
+    }
+    .form-section header p {
+      margin-bottom: 30px;
+    }
+  }
+  @media (max-width: 500px) {
+    .form {
+      max-width: 100%;
+    }
+    .form-section header h2 {
+      font-size: 2rem;
+    }
+    .form-section header p {
+      font-size: 0.8rem;
+    }
+  }
+  .form {
+    width: 350px;
+    text-align: center;
+    background-color: var(--background-color);
+    padding: 50px 30px;
+    border-radius: 15px;
+    box-shadow: 0 0px 10px 0 var(--shadow-color);
+    position: relative;
+    z-index: 2;
+  }
+  .form input {
+    width: 100%;
+    background-color: transparent;
+    border: 1px solid var(--text-color);
+    margin: 10px 0 5px;
+    padding: 10px 20px;
+    transition-duration: 0.3s;
+    border-radius: 5px;
+  }
+  .form input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+  }
+  .form .btn {
+    background-color: var(--secondary-color);
+    color: var(--background-color);
+    border: none;
+    cursor: pointer;
+  }
+  .form .btn:hover {
+    background-color: var(--primary-color);
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="form-section">
+  <div class="container">
+    <header>
+      <h2>Money Wise</h2>
+      <p>Your Personal Finance Assistant</p>
+    </header>
+    <div class="form">
+      <h2>Login</h2>
+      <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div>{{ form.username(class="form-control") }}</div>
+        <div>{{ form.password(class="form-control") }}</div>
+        {% if form.confirm_password %}
+        <div>{{ form.confirm_password(class="form-control") }}</div>
+        {% endif %}
+        <div>{{ form.submit(class="btn btn-primary") }}</div>
+      </form>
+      <p>
+        Don't have an account yet,
+        <a href="{{ url_for('register')}}">Register</a>
+      </p>
+    </div>
+  </div>
+  <div class="area">
+    <ul class="circles">
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+  </div>
+</div>
+{% endblock %}
